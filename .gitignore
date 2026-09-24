@@ -1,0 +1,35 @@
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+.venv/
+venv/
+env/
+
+# API response cache — NOT committed except the curated demo set below
+data/cache/*
+!data/cache/.gitkeep
+!data/cache/demo/
+
+# Local run-history database (app/api/store.py)
+data/history.db
+
+# Generated reports
+out/
+*.pdf
+!docs/**/*.pdf
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

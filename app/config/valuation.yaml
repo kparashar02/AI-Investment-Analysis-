@@ -1,0 +1,87 @@
+# ============================================================================
+# valuation.yaml — DCF and reconciliation parameters (PRD 11, 8.9)
+#
+# Like weights.yaml and thresholds.yaml, this is deliberately data, not code:
+# every assumption that moves a fair value lives here where an evaluator can
+# read and argue with it, and `version` is stamped onto every report.
+#
+# In Phase 2 these values also stand in for the LLM's role. The Valuation Agent
+# (Phase 3) proposes a growth-fade path and refines the risk premium; until it
+# exists, the DCF runs on the deterministic defaults below (historical growth
+# faded to terminal), so a fair value can be produced with no model in the loop
+# (PRD Phase 2 exit criterion). Every guardrail is applied identically whether
+# the assumptions come from this file or from the agent.
+# ============================================================================
+
+version: "1.0.0"
+
+# ------------------------------------------------------------------ WACC ------
+# Cost of capital build-up (PRD 11.1). Rates are in percent.
+wacc:
+  # 10-year Indian G-Sec yield. Live-fetched in Phase 3 (PRD source matrix);
+  # this is the cited fallback constant used deterministically in Phase 2.
+  risk_free_rate_pct: 7.0
+  # India equity risk premium, kept inside the PRD's 6.0-8.5% band and cited.
+  equity_risk_premium_pct: 7.0
+  # Beta from a 5-year monthly regression vs. NIFTY 50 (Phase 3), floored and
+  # capped here. In Phase 2 the market data's beta is used if present, else the
+  # default. A clamp flags the DCF LOW_CONFIDENCE (PRD 8.9).
+  beta_floor: 0.5
+  beta_cap: 2.0
+  beta_default: 1.0
+  # Cost of debt is Interest Expense / Average Total Debt, computed from the
+  # statements; this floor guards against a spuriously tiny Rd on near-zero
+  # reported interest.
+  cost_of_debt_floor_pct: 3.0
+
+# -------------------------------------------------------------- forecast ------
+forecast:
+  horizon_years: 5          # explicit forecast stage (PRD 8.9: 5 or 10)
+  # Effective tax rate is a 3-year average, capped at the statutory rate so a
+  # one-off tax credit cannot inflate every forecast year's FCFF.
+  tax_averaging_years: 3
+  statutory_tax_rate_pct: 25.17   # India headline corporate rate (22% + surcharge/cess)
+
+# ------------------------------------------------------- terminal growth ------
+terminal_growth:
+  min_pct: 3.0
+  max_pct: 5.5              # India nominal long-run ceiling (PRD 8.9)
+  # g must sit at least this far below WACC; otherwise TV explodes. If enforcing
+  # this pushes g below min_pct, the DCF is flagged LOW_CONFIDENCE.
+  wacc_spread_min_pct: 1.5
+
+# ------------------------------------------- deterministic assumption path ----
+# Used when no agent-supplied assumptions are provided (Phase 2).
+default_assumptions:
+  # Year-1 revenue growth = historical revenue CAGR, clamped into this band,
+  # then faded linearly to terminal growth across the horizon.
+  revenue_growth_floor_pct: 0.0
+  revenue_growth_cap_pct: 25.0
+  # Margin, capex intensity and NWC intensity are held at their recent levels:
+  # EBIT margin at the latest year, capex and ΔNWC at their multi-year average
+  # share of revenue. Conservative and fully mechanical.
+  capex_averaging_years: 3
+  nwc_averaging_years: 3
+
+# ---------------------------------------------------------- sensitivity -------
+# The report presents the DCF as a range, never a point (PRD 11.1). The grid is
+# base WACC + these deltas, against these absolute terminal-growth points.
+sensitivity:
+  wacc_deltas_pct: [-2.0, -1.0, 0.0, 1.0, 2.0]
+  terminal_growth_points_pct: [3.0, 3.5, 4.0, 4.5, 5.0]
+  # The published DCF range spans the cells one step either side of the base
+  # case (pessimistic: +1% WACC / -0.5% g; optimistic: -1% WACC / +0.5% g).
+  range_wacc_step_pct: 1.0
+  range_growth_step_pct: 0.5
+  # When the fair-value range is wider than this multiple of the base case, the
+  # DCF is too sensitive to its assumptions to trust as a point of reference and
+  # is flagged LOW_CONFIDENCE. A distressed company near the WACC-g boundary
+  # produces exactly this pathology.
+  max_range_ratio_for_confidence: 1.0
+
+# --------------------------------------------------------- reconciliation -----
+# Method weights live in weights.yaml (valuation_methods); repeated here only as
+# the fallback if that section is absent. A LOW_CONFIDENCE DCF has its weight
+# halved and the remainder redistributed proportionally (PRD 11.3).
+reconciliation:
+  low_confidence_dcf_weight_multiplier: 0.5

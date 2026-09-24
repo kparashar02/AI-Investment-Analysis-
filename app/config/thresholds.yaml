@@ -1,0 +1,388 @@
+# ============================================================================
+# thresholds.yaml — metric normalisation curves
+#
+# Maps a raw metric value onto a 0-100 "band score" by piecewise-linear
+# interpolation over the declared curve.
+#
+# UNITS ARE NATURAL DISPLAY UNITS. This is a deliberate convention (see
+# docs/METHODOLOGY.md 2.1): percentages are held as percentages (46.2, not
+# 0.462), ratios as multiples (0.40), days as days. Curve x-values are in the
+# same unit as the metric, so this file can be read and argued with directly.
+#
+# CURVE SEMANTICS
+#   curve: [[x1, s1], [x2, s2], ...]   x strictly increasing, s in [0, 100]
+#   - value <= x1        -> s1          (clamped, no extrapolation)
+#   - value >= xN        -> sN          (clamped, no extrapolation)
+#   - between            -> linear interpolation
+#   The curve encodes direction: a "lower is better" metric simply has a
+#   decreasing s. There is no direction flag driving the maths — `direction`
+#   below is descriptive only, used for report labelling.
+#
+# Changing anything in this file changes every score the system produces,
+# which is why `version` is stamped onto every report (PRD NF18).
+# ============================================================================
+
+version: "1.0.0"
+
+# Blend of absolute standard vs. peer-relative standing (PRD 12.2).
+# A 12% ROE is mediocre in IT services and strong in a regulated utility, so
+# the final score is judged both ways. With no peer set, band_score stands alone.
+blend:
+  absolute_band: 0.60
+  peer_percentile: 0.40
+
+metrics:
+
+  # ---------------------------------------------------------------- returns --
+  roe:
+    unit: PCT
+    direction: higher_better
+    label: Return on Equity
+    curve: [[0, 0], [8, 30], [15, 55], [20, 75], [30, 92], [50, 100]]
+
+  roce:
+    unit: PCT
+    direction: higher_better
+    label: Return on Capital Employed
+    curve: [[0, 0], [10, 30], [15, 55], [22, 78], [32, 93], [50, 100]]
+
+  roa:
+    unit: PCT
+    direction: higher_better
+    label: Return on Assets
+    curve: [[0, 0], [3, 28], [7, 55], [12, 78], [20, 94], [30, 100]]
+
+  roic:
+    unit: PCT
+    direction: higher_better
+    label: Return on Invested Capital
+    curve: [[0, 0], [8, 32], [13, 58], [20, 80], [30, 94], [45, 100]]
+
+  # ---------------------------------------------------------- profitability --
+  gross_margin:
+    unit: PCT
+    direction: higher_better
+    label: Gross Margin
+    curve: [[5, 5], [15, 30], [25, 50], [40, 72], [55, 88], [70, 100]]
+
+  ebitda_margin:
+    unit: PCT
+    direction: higher_better
+    label: EBITDA Margin
+    curve: [[0, 0], [8, 28], [15, 50], [22, 72], [30, 88], [45, 100]]
+
+  ebit_margin:
+    unit: PCT
+    direction: higher_better
+    label: EBIT (Operating) Margin
+    curve: [[0, 0], [5, 25], [12, 50], [20, 74], [28, 90], [40, 100]]
+
+  net_margin:
+    unit: PCT
+    direction: higher_better
+    label: Net Profit Margin
+    curve: [[0, 0], [3, 22], [8, 48], [14, 72], [22, 90], [35, 100]]
+
+  # -------------------------------------------------------------- leverage ---
+  debt_to_equity:
+    unit: RATIO
+    direction: lower_better
+    label: Debt to Equity
+    curve: [[0.0, 100], [0.30, 90], [0.70, 70], [1.50, 45], [2.50, 20], [5.00, 0]]
+
+  net_debt_to_ebitda:
+    unit: TIMES
+    direction: lower_better
+    label: Net Debt / EBITDA
+    # Negative = net cash, which is a strength, hence the flat 100 to the left.
+    curve: [[-2.0, 100], [0.0, 95], [1.0, 82], [2.0, 65], [3.5, 40], [5.0, 18], [8.0, 0]]
+
+  interest_coverage:
+    unit: TIMES
+    direction: higher_better
+    label: Interest Coverage
+    curve: [[0.0, 0], [1.5, 20], [3.0, 45], [6.0, 70], [12.0, 88], [30.0, 100]]
+
+  dscr:
+    unit: TIMES
+    direction: higher_better
+    label: Debt Service Coverage Ratio
+    curve: [[0.0, 0], [1.0, 25], [1.5, 50], [2.5, 75], [4.0, 92], [6.0, 100]]
+
+  # ------------------------------------------------------------- liquidity ---
+  current_ratio:
+    unit: RATIO
+    direction: higher_better_to_a_point
+    label: Current Ratio
+    # Note the decline after 3.0x. A very high current ratio is not a virtue —
+    # it usually means capital idling in receivables or inventory. Encoding
+    # that as a hump rather than a monotone curve is a deliberate analytical
+    # choice; see docs/METHODOLOGY.md 2.3.
+    curve: [[0.4, 5], [0.8, 25], [1.0, 40], [1.5, 68], [2.0, 86], [3.0, 95], [5.0, 78], [8.0, 60]]
+
+  quick_ratio:
+    unit: RATIO
+    direction: higher_better_to_a_point
+    label: Quick Ratio
+    curve: [[0.2, 5], [0.5, 25], [0.8, 48], [1.2, 75], [2.0, 92], [4.0, 80]]
+
+  # ------------------------------------------------------------ efficiency ---
+  asset_turnover:
+    unit: TIMES
+    direction: higher_better
+    label: Asset Turnover
+    curve: [[0.2, 10], [0.5, 30], [0.9, 55], [1.3, 75], [2.0, 92], [3.0, 100]]
+
+  receivable_days:
+    unit: DAYS
+    direction: lower_better
+    label: Receivable Days (DSO)
+    curve: [[15, 100], [30, 88], [50, 70], [75, 48], [110, 25], [180, 0]]
+
+  inventory_days:
+    unit: DAYS
+    direction: lower_better
+    label: Inventory Days
+    curve: [[10, 100], [30, 85], [60, 65], [100, 42], [150, 20], [250, 0]]
+
+  cash_conversion_cycle:
+    unit: DAYS
+    direction: lower_better
+    label: Cash Conversion Cycle
+    # Negative CCC (supplier-financed working capital) is excellent.
+    curve: [[-60, 100], [0, 92], [30, 78], [60, 60], [100, 38], [150, 18], [220, 0]]
+
+  # ----------------------------------------------------------- cash flow -----
+  ocf_to_pat:
+    unit: RATIO
+    direction: higher_better
+    label: OCF / PAT (Cash Conversion)
+    # The single most important earnings-quality indicator in this system.
+    # Below 0.5 sustained triggers veto rule V3 (PRD 12.6).
+    curve: [[0.0, 0], [0.40, 15], [0.70, 40], [0.90, 65], [1.10, 85], [1.40, 96], [2.00, 100]]
+
+  fcf_margin:
+    unit: PCT
+    direction: higher_better
+    label: Free Cash Flow Margin
+    curve: [[-10, 0], [0, 25], [4, 45], [8, 65], [14, 85], [25, 100]]
+
+  capex_intensity:
+    unit: PCT
+    direction: context_dependent
+    label: Capex Intensity (Capex / Revenue)
+    # Hump-shaped, and this is the point: near-zero capex often means a company
+    # is underinvesting in its own asset base, while very high capex strains
+    # free cash flow. The optimum band is industry-specific — override per
+    # sector below. See docs/METHODOLOGY.md 2.3.
+    curve: [[0.0, 62], [2.0, 82], [4.0, 88], [7.0, 80], [12.0, 58], [20.0, 32], [35.0, 8]]
+
+  # -------------------------------------------------------------- growth -----
+  # Growth rates carry no year suffix by design: they are computed over the
+  # full available annual window and each metric reports its own endpoints and
+  # interval count. See app/engine/growth.py for why that ambiguity is worth
+  # eliminating.
+  revenue_cagr:
+    unit: PCT
+    direction: higher_better
+    label: Revenue CAGR
+    curve: [[-10, 0], [0, 20], [6, 42], [12, 65], [20, 85], [35, 100]]
+
+  ebitda_cagr:
+    unit: PCT
+    direction: higher_better
+    label: EBITDA CAGR
+    curve: [[-10, 0], [0, 20], [7, 44], [14, 68], [22, 87], [38, 100]]
+
+  pat_cagr:
+    unit: PCT
+    direction: higher_better
+    label: PAT CAGR
+    curve: [[-15, 0], [0, 18], [8, 42], [15, 66], [25, 87], [40, 100]]
+
+  eps_cagr:
+    unit: PCT
+    direction: higher_better
+    label: EPS CAGR
+    curve: [[-15, 0], [0, 18], [8, 42], [15, 66], [25, 87], [40, 100]]
+
+  fcf_cagr:
+    unit: PCT
+    direction: higher_better
+    label: Free Cash Flow CAGR
+    curve: [[-20, 0], [0, 22], [8, 45], [16, 70], [26, 88], [45, 100]]
+
+  growth_consistency:
+    unit: SCORE
+    direction: higher_better
+    label: Growth Consistency
+    # Already computed on a 0-100 scale, so the curve is the identity.
+    curve: [[0, 0], [100, 100]]
+
+  ebitda_margin_trend:
+    unit: PP_PER_YEAR
+    direction: higher_better
+    label: EBITDA Margin Trend
+    # Percentage points per year, OLS slope over the available history.
+    curve: [[-3.0, 0], [-1.0, 25], [0.0, 50], [0.5, 65], [1.5, 85], [3.0, 100]]
+
+  # ------------------------------------------------------ composite screens --
+  piotroski_f_score:
+    unit: SCORE
+    direction: higher_better
+    label: Piotroski F-Score (0-9)
+    curve: [[0, 0], [2, 12], [4, 33], [5, 48], [6, 62], [7, 76], [8, 90], [9, 100]]
+
+  altman_z_score:
+    unit: SCORE
+    direction: higher_better
+    label: Altman Z-Score
+    # Zone boundaries for the original public-manufacturing model: distress
+    # below 1.81, grey 1.81-2.99, safe above 2.99. Below 1.81 triggers veto V4.
+    curve: [[0.0, 0], [1.10, 12], [1.81, 30], [2.40, 48], [2.99, 68], [4.00, 88], [6.00, 100]]
+
+  # ------------------------------------------------------------ valuation ----
+  # Absolute valuation bands are a weak signal on their own — a 40x P/E can be
+  # cheap and a 9x P/E expensive. In Phase 2 the valuation pillar is driven
+  # primarily by upside to reconciled fair value and by peer/own-history
+  # percentiles (PRD 12.3). These curves exist only as a sanity floor and
+  # carry the smallest weights in that pillar.
+  pe_ratio:
+    unit: TIMES
+    direction: lower_better
+    label: P/E (trailing)
+    curve: [[5, 95], [12, 82], [20, 62], [30, 42], [45, 22], [70, 5]]
+
+  pb_ratio:
+    unit: TIMES
+    direction: lower_better
+    label: P/B
+    curve: [[0.5, 95], [1.5, 80], [3.0, 60], [5.0, 40], [8.0, 20], [15.0, 5]]
+
+  ev_ebitda:
+    unit: TIMES
+    direction: lower_better
+    label: EV / EBITDA
+    curve: [[3, 95], [7, 80], [12, 60], [18, 40], [26, 20], [40, 5]]
+
+  p_fcf:
+    unit: TIMES
+    direction: lower_better
+    label: Price / Free Cash Flow
+    curve: [[5, 95], [12, 80], [20, 62], [32, 40], [50, 20], [80, 5]]
+
+  earnings_yield:
+    unit: PCT
+    direction: higher_better
+    label: Earnings Yield
+    curve: [[1, 5], [3, 25], [5, 45], [8, 68], [12, 88], [18, 100]]
+
+  dividend_yield:
+    unit: PCT
+    direction: higher_better
+    label: Dividend Yield
+    curve: [[0.0, 35], [0.8, 50], [1.8, 65], [3.0, 80], [5.0, 92], [8.0, 100]]
+
+  dividend_payout:
+    unit: PCT
+    direction: context_dependent
+    label: Dividend Payout Ratio
+    # Hump: zero payout may signal reinvestment (fine) or inability to pay;
+    # above ~80% is usually unsustainable or signals no growth runway.
+    curve: [[0, 45], [15, 65], [30, 85], [50, 88], [70, 70], [90, 45], [120, 15]]
+
+  # ------------------------------------------------ valuation pillar (Phase 2) --
+  # These four are the scored components of the valuation pillar (weights.yaml).
+  # They are derived, not raw multiples: they compare price to the reconciled
+  # fair value, to peers, and to the company's own history. A score of 50 is
+  # "fairly valued"; above 50 means cheap (attractive), below means expensive.
+
+  upside_to_fair_value:
+    unit: PCT
+    direction: higher_better
+    label: Upside to Reconciled Fair Value
+    # % (fair value / price - 1). 0% = fairly valued -> 50. Deep discount to
+    # intrinsic value scores high; a large premium (negative upside) scores low.
+    curve: [[-40, 0], [-20, 18], [0, 50], [15, 72], [35, 90], [60, 100]]
+
+  pe_vs_peer_median:
+    unit: PCT
+    direction: lower_better
+    label: P/E vs. Peer Median
+    # % premium/discount to the peer-set median P/E. A discount (negative)
+    # is attractive; a premium is penalised unless quality justifies it
+    # (the premium-vs-quality adjustment is applied in valuation.py).
+    curve: [[-40, 100], [-20, 84], [0, 60], [20, 42], [40, 26], [80, 0]]
+
+  ev_ebitda_vs_peer_median:
+    unit: PCT
+    direction: lower_better
+    label: EV/EBITDA vs. Peer Median
+    curve: [[-40, 100], [-20, 84], [0, 60], [20, 42], [40, 26], [80, 0]]
+
+  pe_vs_own_history:
+    unit: PCT
+    direction: lower_better
+    label: P/E vs. Own 5-Year Median
+    # Mean-reversion view: trading below its own historical median multiple
+    # is attractive, above it is stretched.
+    curve: [[-40, 100], [-20, 82], [0, 58], [20, 40], [40, 24], [80, 0]]
+
+
+# ============================================================================
+# SECTOR OVERRIDES
+#
+# Merged over the base curves by sector key. Only the metrics listed are
+# replaced; everything else falls through to the base curve above.
+# Sector keys are produced by app/engine/normalisation.sector_key().
+# ============================================================================
+sector_overrides:
+
+  it_services:
+    # Asset-light, high-margin, low-capex. Base curves would flatter IT firms
+    # on leverage/capex and understate what "good" means on returns.
+    roe:
+      curve: [[0, 0], [12, 30], [20, 55], [28, 78], [40, 93], [60, 100]]
+    roce:
+      curve: [[0, 0], [15, 30], [25, 55], [35, 78], [50, 93], [70, 100]]
+    ebitda_margin:
+      curve: [[0, 0], [10, 25], [18, 48], [24, 70], [30, 88], [40, 100]]
+    capex_intensity:
+      curve: [[0.0, 70], [1.5, 88], [3.0, 85], [6.0, 65], [10.0, 42], [18.0, 15]]
+    inventory_days:
+      # Services carry no meaningful inventory; do not reward or punish.
+      curve: [[0, 50], [1000, 50]]
+
+  pharmaceuticals:
+    ebitda_margin:
+      curve: [[0, 0], [10, 28], [18, 52], [25, 74], [32, 90], [45, 100]]
+    capex_intensity:
+      curve: [[0.0, 50], [3.0, 78], [6.0, 88], [10.0, 78], [16.0, 55], [28.0, 22]]
+
+  fmcg:
+    roce:
+      curve: [[0, 0], [15, 28], [25, 52], [40, 76], [60, 92], [90, 100]]
+    net_margin:
+      curve: [[0, 0], [4, 24], [9, 50], [15, 74], [22, 90], [32, 100]]
+
+  capital_goods:
+    capex_intensity:
+      curve: [[0.0, 45], [3.0, 75], [6.0, 88], [11.0, 78], [18.0, 52], [30.0, 20]]
+    receivable_days:
+      # Project businesses structurally carry longer receivables.
+      curve: [[30, 100], [60, 85], [95, 66], [130, 45], [180, 22], [260, 0]]
+
+  metals_mining:
+    capex_intensity:
+      curve: [[0.0, 40], [4.0, 70], [9.0, 88], [15.0, 76], [24.0, 50], [40.0, 18]]
+    debt_to_equity:
+      curve: [[0.0, 100], [0.50, 88], [1.00, 70], [1.80, 46], [3.00, 20], [5.50, 0]]
+
+  utilities:
+    roe:
+      curve: [[0, 0], [6, 32], [11, 58], [16, 78], [22, 93], [30, 100]]
+    debt_to_equity:
+      # Regulated cash flows support structurally higher leverage.
+      curve: [[0.0, 100], [0.60, 90], [1.20, 74], [2.00, 52], [3.20, 24], [6.00, 0]]
+    capex_intensity:
+      curve: [[0.0, 35], [5.0, 68], [12.0, 88], [20.0, 76], [32.0, 48], [50.0, 15]]

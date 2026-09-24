@@ -1,0 +1,158 @@
+{
+  "_meta": {
+    "kind": "SYNTHETIC",
+    "warning": "NOT a real company. Leveraged Cyclicals Ltd is fabricated.",
+    "purpose": "Exercise the failure branches that a healthy company never reaches (PRD 19.1 / 19.7).",
+    "designed_properties": [
+      "Revenue and profit declining: negative CAGRs, so the CAGR guard on non-positive endpoints and the negative-growth curve region are both hit.",
+      "OCF/PAT below 0.5 in FY2024, FY2025 and FY2026 but above it in FY2023 — a streak of exactly 3, which is the boundary condition for veto rule V3.",
+      "Net Debt/EBITDA 5.76x with interest coverage 1.25x — both legs of veto rule V2 satisfied.",
+      "Altman Z of roughly 1.14, inside the distress zone, triggering veto rule V4.",
+      "Negative free cash flow in four of five years, so the FCF-based multiples must suppress rather than report a negative.",
+      "Piotroski F-Score low, exercising the negative branch of every signal.",
+      "Sector 'Metals & Mining' so those threshold overrides are exercised."
+    ]
+  },
+
+  "company": {
+    "ticker": "LEVCYC.NS",
+    "company_name": "Leveraged Cyclicals Ltd (SYNTHETIC)",
+    "sector": "Metals & Mining",
+    "industry": "Steel",
+    "fiscal_year_end": "03-31"
+  },
+
+  "market": {
+    "ticker": "LEVCYC.NS",
+    "cmp": 25.0,
+    "shares_outstanding": 30.0,
+    "beta": 1.65,
+    "week_52_high": 48.0,
+    "week_52_low": 22.0,
+    "as_of": "2026-03-31",
+    "source": "synthetic"
+  },
+
+  "annual": [
+    {
+      "label": "FY2026",
+      "period_end": "2026-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 3000.0, "cogs": 2250.0, "gross_profit": 750.0,
+        "other_operating_expenses": 420.0, "ebitda": 330.0,
+        "depreciation_amortisation": 180.0, "ebit": 150.0,
+        "other_income": 15.0, "interest_expense": 120.0,
+        "pbt": 45.0, "tax_expense": 12.0, "pat": 33.0,
+        "shares_basic": 30.0, "shares_diluted": 30.0, "dps": 0.0
+      },
+      "balance": {
+        "cash_and_equivalents": 100.0, "current_investments": 0.0,
+        "inventory": 700.0, "receivables": 900.0, "other_current_assets": 100.0,
+        "total_current_assets": 1800.0,
+        "net_fixed_assets": 1900.0, "goodwill_and_intangibles": 100.0,
+        "other_non_current_assets": 200.0, "total_assets": 4000.0,
+        "payables": 800.0, "short_term_debt": 600.0,
+        "other_current_liabilities": 300.0, "total_current_liabilities": 1700.0,
+        "long_term_debt": 1400.0, "other_non_current_liabilities": 300.0,
+        "total_liabilities": 3400.0,
+        "share_capital": 300.0, "reserves": 300.0, "shareholders_equity": 600.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 15.0, "capex": 160.0, "free_cash_flow": -145.0,
+        "dividends_paid": 0.0, "depreciation_amortisation": 180.0
+      }
+    },
+    {
+      "label": "FY2025",
+      "period_end": "2025-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 3200.0, "cogs": 2380.0, "gross_profit": 820.0,
+        "other_operating_expenses": 430.0, "ebitda": 390.0,
+        "depreciation_amortisation": 175.0, "ebit": 215.0,
+        "other_income": 12.0, "interest_expense": 115.0,
+        "pbt": 112.0, "tax_expense": 30.0, "pat": 82.0,
+        "shares_basic": 30.0, "shares_diluted": 30.0, "dps": 0.0
+      },
+      "balance": {
+        "cash_and_equivalents": 120.0, "current_investments": 0.0,
+        "inventory": 660.0, "receivables": 850.0, "other_current_assets": 95.0,
+        "total_current_assets": 1725.0,
+        "net_fixed_assets": 1880.0, "goodwill_and_intangibles": 100.0,
+        "other_non_current_assets": 195.0, "total_assets": 3900.0,
+        "payables": 760.0, "short_term_debt": 560.0,
+        "other_current_liabilities": 290.0, "total_current_liabilities": 1610.0,
+        "long_term_debt": 1420.0, "other_non_current_liabilities": 300.0,
+        "total_liabilities": 3330.0,
+        "share_capital": 300.0, "reserves": 270.0, "shareholders_equity": 570.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 30.0, "capex": 150.0, "free_cash_flow": -120.0,
+        "dividends_paid": 0.0, "depreciation_amortisation": 175.0
+      }
+    },
+    {
+      "label": "FY2024",
+      "period_end": "2024-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 3400.0, "cogs": 2480.0, "gross_profit": 920.0,
+        "other_operating_expenses": 440.0, "ebitda": 480.0,
+        "depreciation_amortisation": 170.0, "ebit": 310.0,
+        "other_income": 10.0, "interest_expense": 110.0,
+        "pbt": 210.0, "tax_expense": 55.0, "pat": 155.0,
+        "shares_basic": 30.0, "shares_diluted": 30.0, "dps": 0.0
+      },
+      "balance": {
+        "cash_and_equivalents": 140.0, "current_investments": 0.0,
+        "inventory": 640.0, "receivables": 800.0, "other_current_assets": 90.0,
+        "total_current_assets": 1670.0,
+        "net_fixed_assets": 1850.0, "goodwill_and_intangibles": 100.0,
+        "other_non_current_assets": 190.0, "total_assets": 3810.0,
+        "payables": 730.0, "short_term_debt": 520.0,
+        "other_current_liabilities": 280.0, "total_current_liabilities": 1530.0,
+        "long_term_debt": 1450.0, "other_non_current_liabilities": 300.0,
+        "total_liabilities": 3280.0,
+        "share_capital": 300.0, "reserves": 230.0, "shareholders_equity": 530.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 60.0, "capex": 145.0, "free_cash_flow": -85.0,
+        "dividends_paid": 0.0, "depreciation_amortisation": 170.0
+      }
+    },
+    {
+      "label": "FY2023",
+      "period_end": "2023-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 3500.0, "cogs": 2520.0, "gross_profit": 980.0,
+        "other_operating_expenses": 450.0, "ebitda": 530.0,
+        "depreciation_amortisation": 165.0, "ebit": 365.0,
+        "other_income": 8.0, "interest_expense": 105.0,
+        "pbt": 268.0, "tax_expense": 70.0, "pat": 198.0,
+        "shares_basic": 30.0, "shares_diluted": 30.0, "dps": 0.0
+      },
+      "balance": {
+        "cash_and_equivalents": 155.0, "current_investments": 0.0,
+        "inventory": 620.0, "receivables": 780.0, "other_current_assets": 85.0,
+        "total_current_assets": 1640.0,
+        "net_fixed_assets": 1820.0, "goodwill_and_intangibles": 100.0,
+        "other_non_current_assets": 185.0, "total_assets": 3745.0,
+        "payables": 700.0, "short_term_debt": 500.0,
+        "other_current_liabilities": 270.0, "total_current_liabilities": 1470.0,
+        "long_term_debt": 1480.0, "other_non_current_liabilities": 300.0,
+        "total_liabilities": 3250.0,
+        "share_capital": 300.0, "reserves": 195.0, "shareholders_equity": 495.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 210.0, "capex": 140.0, "free_cash_flow": 70.0,
+        "dividends_paid": 0.0, "depreciation_amortisation": 165.0
+      }
+    }
+  ]
+}

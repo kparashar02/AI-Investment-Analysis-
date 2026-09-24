@@ -1,0 +1,170 @@
+# ============================================================================
+# weights.yaml — the scoring configuration
+#
+# This file is the scoring model. It is deliberately data, not code, so that
+# an evaluator can read and argue with the model without reading Python, and
+# so that `version` below can be stamped onto every report (PRD NF18).
+#
+# Phase 1 (the computation layer) uses only `metric_score_blend` and the
+# pillar component weights for its per-pillar preview. The composite score,
+# rating bands and veto rules are consumed by the Phase 2 decision engine.
+# ============================================================================
+
+version: "1.0.0"
+
+# ---------------------------------------------------------------- pillars ----
+# Justification (PRD 12.1): over a multi-quarter horizon business quality
+# dominates returns, so fundamentals carry the most weight. Valuation is
+# second because entry price determines realised return even for a good
+# business. News is capped at 10% so short-term sentiment cannot hijack a
+# fundamental process. Risk carries a small direct weight because its real
+# job is to veto (see `vetoes`), not to shave points off an average.
+pillars:
+  fundamentals: 0.30
+  valuation:    0.20
+  growth:       0.15
+  cashflow:     0.10
+  industry:     0.10
+  news:         0.10
+  risk:         0.05
+
+# --------------------------------------------------- pillar composition ------
+# Weights within each pillar. Must sum to 1.0 per pillar; asserted at load.
+# When a component metric is unavailable, its weight is redistributed
+# proportionally across the components that are available, and the pillar
+# records the redistribution in its notes.
+components:
+
+  fundamentals:
+    roe:               0.20
+    roce:              0.20
+    ebitda_margin:     0.15
+    net_margin:        0.10
+    debt_to_equity:    0.15
+    interest_coverage: 0.10
+    piotroski_f_score: 0.10
+
+  growth:
+    revenue_cagr:        0.25
+    pat_cagr:            0.25
+    eps_cagr:            0.20
+    growth_consistency:  0.15
+    ebitda_margin_trend: 0.15
+
+  cashflow:
+    ocf_to_pat:      0.35
+    fcf_margin:      0.30
+    fcf_cagr:        0.20
+    capex_intensity: 0.15
+
+  # Phase 2. Upside to reconciled fair value dominates; absolute multiple
+  # bands are a sanity floor only.
+  valuation:
+    upside_to_fair_value:  0.40
+    pe_vs_peer_median:     0.20
+    ev_ebitda_vs_peer_median: 0.20
+    pe_vs_own_history:     0.20
+
+  # Phase 3. Sourced from the Industry Agent's bounded 1-5 structured fields,
+  # mapped to 0-100 in Python — the agent never emits a pillar score directly.
+  industry:
+    growth_outlook:        0.35
+    competitive_intensity: 0.25
+    regulatory_risk:       0.20
+    cyclicality:           0.20
+
+  # Phase 3. Computed in Python from per-article assessments; see news_scoring.
+  news:
+    materiality_weighted_direction: 1.00
+
+  # Phase 3. Inverted before entering the composite (100 - risk).
+  risk:
+    financial_risk:    0.40
+    business_risk:     0.30
+    valuation_risk:    0.20
+    governance_flags:  0.10
+
+# ------------------------------------------------------------- valuation -----
+# Reconciliation weights across the three fair-value methods (PRD 11.3).
+# If the DCF is flagged LOW_CONFIDENCE its weight halves and the remainder is
+# redistributed proportionally.
+valuation_methods:
+  dcf:           0.50
+  peer_relative: 0.30
+  own_history:   0.20
+
+# ------------------------------------------------- metric score blending -----
+metric_score_blend:
+  absolute_band:   0.60
+  peer_percentile: 0.40
+
+# ------------------------------------------------------------ news scoring ---
+news_scoring:
+  lookback_days:         60
+  recency_halflife_days: 30    # weight = exp(-age_days / 30)
+  min_weight_threshold:  2.0   # below this, news_score = 50 (neutral) + flag
+  source_tier_credibility:
+    1: 1.00
+    2: 0.60
+    3: 0.25
+
+# ----------------------------------------------------------- rating bands ----
+# Half-open intervals [low, high). Checked for contiguity at load.
+rating_bands:
+  BUY:        [78, 101]
+  ACCUMULATE: [65, 78]
+  HOLD:       [45, 65]
+  REDUCE:     [30, 45]
+  SELL:       [0,  30]
+
+# ------------------------------------------------------------- guardrails ----
+# Conditions that cap or override the rating regardless of composite score
+# (PRD 12.6). Consumed by app/engine/guardrails.py in Phase 2.
+vetoes:
+  V1:
+    description: Data completeness below the minimum required to rate
+    condition: data_completeness_pct < 70
+    action: NO_RATING
+  V2:
+    description: Severe leverage with inadequate interest cover
+    condition: net_debt_to_ebitda > 5.0 and interest_coverage < 1.5
+    action: CAP_AT_REDUCE
+  V3:
+    description: Persistently poor cash conversion (earnings quality)
+    condition: ocf_to_pat < 0.5 for 3 consecutive years
+    action: CAP_AT_HOLD
+  V4:
+    description: Altman Z-Score in the distress zone
+    condition: altman_z_score < 1.81
+    action: CAP_AT_REDUCE
+  V5:
+    description: Negative shareholders equity
+    condition: shareholders_equity < 0
+    action: SELL_OR_NO_RATING
+  V6:
+    description: High-severity governance flag, evidenced
+    condition: governance_flag_severity == HIGH
+    action: CAP_AT_HOLD
+  V7:
+    description: Large downside to reconciled fair value
+    condition: downside_to_fair_value_pct > 40
+    action: CAP_AT_HOLD
+  V8:
+    description: BFSI sector not supported in V1 (FCFF-DCF invalid)
+    condition: is_bfsi == true
+    action: NOT_SUPPORTED
+  V9:
+    description: Report failed verification twice
+    condition: verification_attempts >= 2 and verification_passed == false
+    action: DOWNGRADE_CONFIDENCE
+  V10:
+    description: Insufficient valid peers for relative valuation
+    condition: valid_peer_count < 3
+    action: HALVE_VALUATION_WEIGHT
+
+# -------------------------------------------------------------- data gates ---
+data_quality:
+  min_completeness_pct_to_rate: 70
+  min_annual_periods:            3    # below this, no growth metrics
+  preferred_annual_periods:      5
+  balance_check_tolerance_pct:   0.1  # |A - (L+E)| / A

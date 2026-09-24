@@ -1,0 +1,110 @@
+# ============================================================================
+# sources.yaml — web research allowlist and source credibility tiers
+#
+# Consumed by the Industry & Macro Agent and the News Analysis Agent (Phase 3).
+# The allowlist exists so an agent cannot cite a tip site or a forum post as
+# evidence for an industry claim (PRD 9.4).
+#
+# Tier drives `credibility_weight` in ArticleAssessment, which feeds the news
+# score arithmetic in Python (PRD 12.3).
+# ============================================================================
+
+version: "1.0.0"
+
+tiers:
+  1:
+    credibility_weight: 1.00
+    label: Official, regulatory, exchange filings, company IR, top-tier wires
+    domains:
+      - rbi.org.in
+      - sebi.gov.in
+      - nseindia.com
+      - bseindia.com
+      - mospi.gov.in
+      - finmin.nic.in
+      - dpiit.gov.in
+      - reuters.com
+      - bloomberg.com
+      - livemint.com
+      - business-standard.com
+      - economictimes.indiatimes.com
+      - moneycontrol.com
+      - financialexpress.com
+      - thehindubusinessline.com
+
+  2:
+    credibility_weight: 0.60
+    label: Industry bodies, rating agencies, mainstream press, trade media
+    domains:
+      - nasscom.in
+      - siam.in
+      - ibef.org
+      - crisil.com
+      - icra.in
+      - careratings.com
+      - thehindu.com
+      - indianexpress.com
+      - cnbctv18.com
+      - businesstoday.in
+      - forbesindia.com
+
+  3:
+    credibility_weight: 0.25
+    label: Aggregators and secondary commentary — usable as a signal, not evidence
+    domains:
+      - google_news_aggregate
+      - yahoo.com
+
+blocked:
+  reason: >
+    Unattributed, promotional, or themselves unregistered recommendation
+    services. Content from these sources is discarded before analysis, not
+    merely down-weighted.
+  patterns:
+    - "*.blogspot.*"
+    - "*.wordpress.com"
+    - twitter.com
+    - x.com
+    - facebook.com
+    - reddit.com
+    - telegram.*
+    - youtube.com
+    - "*tips*.in"
+    - "*multibagger*"
+    - "*stockguru*"
+
+# Company IR pages are resolved per-company at runtime and treated as tier 1.
+company_ir:
+  resolve_at_runtime: true
+  trust_tier: 1
+
+# Macro inputs the valuation engine needs live, with their authoritative source.
+macro_inputs:
+  risk_free_rate:
+    description: India 10-year government security yield
+    preferred_domains: [rbi.org.in, worldgovernmentbonds.com, investing.com]
+    fallback_constant_pct: 6.90
+    fallback_requires_disclosure: true
+  equity_risk_premium:
+    description: India equity risk premium
+    preferred_domains: [pages.stern.nyu.edu]   # Damodaran country ERP tables
+    allowed_range_pct: [6.0, 8.5]
+    fallback_constant_pct: 7.20
+    fallback_requires_disclosure: true
+
+# ---------------------------------------------------------------------------
+# CONTENT HANDLING — security posture (PRD 9.5)
+#
+# Every byte retrieved through these sources is DATA, never instruction.
+# Agents receive it inside explicit delimiters and are instructed to report,
+# not obey, any imperative text found within. Because the composite score is
+# computed in Python from bounded numeric fields only, a successful injection
+# into a narrative prompt still cannot change the recommendation. Track 6 of
+# the evaluation harness tests exactly this (PRD 19.6).
+# ---------------------------------------------------------------------------
+content_handling:
+  treat_as_untrusted_data: true
+  wrap_in_delimiters: true
+  max_evidence_quote_words: 25     # copyright: short attributed quotes only
+  reproduce_full_articles: false
+  respect_robots_txt: true

@@ -1,0 +1,201 @@
+{
+  "_meta": {
+    "kind": "SYNTHETIC",
+    "warning": "These are NOT real company figures. Acme Industries Ltd is a fabricated company whose numbers were chosen so that every ratio has an exactly computable closed-form value, which is what makes it usable as an arithmetic golden test. Do not cite it as market data.",
+    "purpose": "Golden-value test of the deterministic computation layer (PRD 19.1, Track 1).",
+    "designed_properties": [
+      "Balance sheet balances exactly in all five years.",
+      "Healthy company: rising margins, positive FCF, OCF/PAT above 1.0, low leverage.",
+      "Piotroski F-Score of 9/9 (every signal passes) to exercise all nine positive branches.",
+      "Altman Z in the safe zone; no veto rule triggers.",
+      "Constant 100 crore share count so EPS growth equals PAT growth exactly.",
+      "Sector 'Capital Goods' so the capital_goods threshold overrides are exercised."
+    ],
+    "real_company_golden_values": "See TEMPLATE.json. Real-company golden files must be populated by hand from published annual reports; they are the Phase 0 deliverable and cannot be generated."
+  },
+
+  "company": {
+    "ticker": "ACME.NS",
+    "company_name": "Acme Industries Ltd (SYNTHETIC)",
+    "sector": "Capital Goods",
+    "industry": "Industrial Machinery",
+    "fiscal_year_end": "03-31"
+  },
+
+  "market": {
+    "ticker": "ACME.NS",
+    "cmp": 150.0,
+    "shares_outstanding": 100.0,
+    "beta": 1.05,
+    "week_52_high": 172.0,
+    "week_52_low": 108.0,
+    "as_of": "2026-03-31",
+    "source": "synthetic"
+  },
+
+  "expected_metrics": {
+    "_note": "Synthetic closed-form values (Track 1 arithmetic check, PRD 19.1). These validate the engine's formulas against known math; they do NOT validate against a real company's filing — that requires a REAL golden hand-entered from an annual report (see TEMPLATE.json).",
+    "roe": {"value": 32.3864, "tolerance_pct": 0.5, "computed_from": "PAT 1425 / avg equity (5000+3800)/2 = 4400", "source": "synthetic closed-form"},
+    "roce": {"value": 27.7778, "tolerance_pct": 0.5, "computed_from": "EBIT 2000 / capital employed (9000-1800) = 7200", "source": "synthetic closed-form"},
+    "debt_to_equity": {"value": 0.40, "tolerance_pct": 0.5, "computed_from": "total debt (400+1600) / equity 5000", "source": "synthetic closed-form"},
+    "ebitda_margin": {"value": 25.0, "tolerance_pct": 0.5, "computed_from": "EBITDA 2500 / revenue 10000", "source": "synthetic closed-form"},
+    "net_margin": {"value": 14.25, "tolerance_pct": 0.5, "computed_from": "PAT 1425 / revenue 10000", "source": "synthetic closed-form"},
+    "interest_coverage": {"value": 10.0, "tolerance_pct": 0.5, "computed_from": "EBIT 2000 / interest 200", "source": "synthetic closed-form"},
+    "current_ratio": {"value": 2.1111, "tolerance_pct": 0.5, "computed_from": "current assets 3800 / current liabilities 1800", "source": "synthetic closed-form"},
+    "piotroski_f_score": {"value": 9.0, "tolerance_pct": 0.5, "computed_from": "all 9 signals pass by construction", "source": "synthetic closed-form"},
+    "pe_ratio": {"value": 10.5263, "tolerance_pct": 0.5, "computed_from": "CMP 150 / EPS (1425/100 = 14.25)", "source": "synthetic closed-form"}
+  },
+
+  "annual": [
+    {
+      "label": "FY2026",
+      "period_end": "2026-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 10000.0, "cogs": 6000.0, "gross_profit": 4000.0,
+        "other_operating_expenses": 1500.0, "ebitda": 2500.0,
+        "depreciation_amortisation": 500.0, "ebit": 2000.0,
+        "other_income": 100.0, "interest_expense": 200.0,
+        "pbt": 1900.0, "tax_expense": 475.0, "pat": 1425.0,
+        "shares_basic": 100.0, "shares_diluted": 100.0, "dps": 5.0
+      },
+      "balance": {
+        "cash_and_equivalents": 800.0, "current_investments": 0.0,
+        "inventory": 1200.0, "receivables": 1500.0, "other_current_assets": 300.0,
+        "total_current_assets": 3800.0,
+        "net_fixed_assets": 4000.0, "goodwill_and_intangibles": 500.0,
+        "other_non_current_assets": 700.0, "total_assets": 9000.0,
+        "payables": 900.0, "short_term_debt": 400.0,
+        "other_current_liabilities": 500.0, "total_current_liabilities": 1800.0,
+        "long_term_debt": 1600.0, "other_non_current_liabilities": 600.0,
+        "total_liabilities": 4000.0,
+        "share_capital": 1000.0, "reserves": 4000.0, "shareholders_equity": 5000.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 1900.0, "capex": 700.0, "free_cash_flow": 1200.0,
+        "dividends_paid": 500.0, "depreciation_amortisation": 500.0
+      }
+    },
+    {
+      "label": "FY2025",
+      "period_end": "2025-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 8000.0, "cogs": 4960.0, "gross_profit": 3040.0,
+        "other_operating_expenses": 1200.0, "ebitda": 1840.0,
+        "depreciation_amortisation": 440.0, "ebit": 1400.0,
+        "other_income": 80.0, "interest_expense": 180.0,
+        "pbt": 1300.0, "tax_expense": 325.0, "pat": 975.0,
+        "shares_basic": 100.0, "shares_diluted": 100.0, "dps": 3.5
+      },
+      "balance": {
+        "cash_and_equivalents": 600.0, "current_investments": 0.0,
+        "inventory": 1000.0, "receivables": 1200.0, "other_current_assets": 200.0,
+        "total_current_assets": 3000.0,
+        "net_fixed_assets": 3500.0, "goodwill_and_intangibles": 500.0,
+        "other_non_current_assets": 600.0, "total_assets": 7600.0,
+        "payables": 800.0, "short_term_debt": 400.0,
+        "other_current_liabilities": 400.0, "total_current_liabilities": 1600.0,
+        "long_term_debt": 1700.0, "other_non_current_liabilities": 500.0,
+        "total_liabilities": 3800.0,
+        "share_capital": 1000.0, "reserves": 2800.0, "shareholders_equity": 3800.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 1300.0, "capex": 600.0, "free_cash_flow": 700.0,
+        "dividends_paid": 350.0, "depreciation_amortisation": 440.0
+      }
+    },
+    {
+      "label": "FY2024",
+      "period_end": "2024-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 7000.0, "cogs": 4340.0, "gross_profit": 2660.0,
+        "other_operating_expenses": 1100.0, "ebitda": 1560.0,
+        "depreciation_amortisation": 400.0, "ebit": 1160.0,
+        "other_income": 70.0, "interest_expense": 175.0,
+        "pbt": 1055.0, "tax_expense": 255.0, "pat": 800.0,
+        "shares_basic": 100.0, "shares_diluted": 100.0, "dps": 3.0
+      },
+      "balance": {
+        "cash_and_equivalents": 520.0, "current_investments": 0.0,
+        "inventory": 950.0, "receivables": 1120.0, "other_current_assets": 180.0,
+        "total_current_assets": 2770.0,
+        "net_fixed_assets": 3250.0, "goodwill_and_intangibles": 500.0,
+        "other_non_current_assets": 550.0, "total_assets": 7070.0,
+        "payables": 750.0, "short_term_debt": 380.0,
+        "other_current_liabilities": 350.0, "total_current_liabilities": 1480.0,
+        "long_term_debt": 1650.0, "other_non_current_liabilities": 480.0,
+        "total_liabilities": 3610.0,
+        "share_capital": 1000.0, "reserves": 2460.0, "shareholders_equity": 3460.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 1100.0, "capex": 580.0, "free_cash_flow": 520.0,
+        "dividends_paid": 250.0, "depreciation_amortisation": 400.0
+      }
+    },
+    {
+      "label": "FY2023",
+      "period_end": "2023-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 6000.0, "cogs": 3720.0, "gross_profit": 2280.0,
+        "other_operating_expenses": 950.0, "ebitda": 1330.0,
+        "depreciation_amortisation": 350.0, "ebit": 980.0,
+        "other_income": 60.0, "interest_expense": 170.0,
+        "pbt": 870.0, "tax_expense": 220.0, "pat": 650.0,
+        "shares_basic": 100.0, "shares_diluted": 100.0, "dps": 2.5
+      },
+      "balance": {
+        "cash_and_equivalents": 450.0, "current_investments": 0.0,
+        "inventory": 900.0, "receivables": 1050.0, "other_current_assets": 170.0,
+        "total_current_assets": 2570.0,
+        "net_fixed_assets": 3000.0, "goodwill_and_intangibles": 500.0,
+        "other_non_current_assets": 500.0, "total_assets": 6570.0,
+        "payables": 700.0, "short_term_debt": 350.0,
+        "other_current_liabilities": 320.0, "total_current_liabilities": 1370.0,
+        "long_term_debt": 1600.0, "other_non_current_liabilities": 450.0,
+        "total_liabilities": 3420.0,
+        "share_capital": 1000.0, "reserves": 2150.0, "shareholders_equity": 3150.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 950.0, "capex": 550.0, "free_cash_flow": 400.0,
+        "dividends_paid": 200.0, "depreciation_amortisation": 350.0
+      }
+    },
+    {
+      "label": "FY2022",
+      "period_end": "2022-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "synthetic",
+      "income": {
+        "revenue": 5000.0, "cogs": 3150.0, "gross_profit": 1850.0,
+        "other_operating_expenses": 800.0, "ebitda": 1050.0,
+        "depreciation_amortisation": 300.0, "ebit": 750.0,
+        "other_income": 50.0, "interest_expense": 160.0,
+        "pbt": 640.0, "tax_expense": 140.0, "pat": 500.0,
+        "shares_basic": 100.0, "shares_diluted": 100.0, "dps": 2.0
+      },
+      "balance": {
+        "cash_and_equivalents": 400.0, "current_investments": 0.0,
+        "inventory": 800.0, "receivables": 900.0, "other_current_assets": 150.0,
+        "total_current_assets": 2250.0,
+        "net_fixed_assets": 2800.0, "goodwill_and_intangibles": 500.0,
+        "other_non_current_assets": 450.0, "total_assets": 6000.0,
+        "payables": 650.0, "short_term_debt": 350.0,
+        "other_current_liabilities": 300.0, "total_current_liabilities": 1300.0,
+        "long_term_debt": 1600.0, "other_non_current_liabilities": 400.0,
+        "total_liabilities": 3300.0,
+        "share_capital": 1000.0, "reserves": 1700.0, "shareholders_equity": 2700.0
+      },
+      "cashflow": {
+        "operating_cash_flow": 800.0, "capex": 500.0, "free_cash_flow": 300.0,
+        "dividends_paid": 150.0, "depreciation_amortisation": 300.0
+      }
+    }
+  ]
+}

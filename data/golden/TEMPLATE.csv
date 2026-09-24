@@ -1,0 +1,52 @@
+section,field,FY2022,FY2023,FY2024,FY2025,FY2026
+# ---------------------------------------------------------------------------
+# Manual statement entry (PRD 9.1 fallback). Hand-enter a real company's five
+# years from its annual report, then compile with:
+#     python -m app.cli import-csv data/golden/mycompany.csv --save mycompany --sheet
+# CONVENTIONS (match the models — no conversion is applied):
+#   * Units: rupees CRORE. Share counts: crore of shares.
+#   * Signs: NATURAL / positive. Enter costs, capex, interest, tax, dividends
+#     as positive magnitudes (capex 700, not -700).
+#   * Prefer CONSOLIDATED statements. Leave a cell blank if not reported.
+#   * 'company' / 'market' rows take a single value (put it in any column).
+#   * revenue and pat are required for every year.
+# ---------------------------------------------------------------------------
+company,ticker,ACME.NS,,,,
+company,company_name,Acme Industries Ltd,,,,
+company,sector,Capital Goods,,,,
+company,industry,Industrial Machinery,,,,
+company,fiscal_year_end,03-31,,,,
+company,basis,CONSOLIDATED,,,,
+# --- income statement ---
+income,revenue,5000,6000,7000,8000,10000
+income,cogs,3150,3720,4340,4960,6000
+income,ebitda,1050,1330,1560,1840,2500
+income,depreciation_amortisation,300,350,400,440,500
+income,ebit,750,980,1160,1400,2000
+income,interest_expense,160,170,175,180,200
+income,pbt,640,870,1055,1300,1900
+income,tax_expense,140,220,255,325,475
+income,pat,500,650,800,975,1425
+income,shares_diluted,100,100,100,100,100
+income,dps,2.0,2.5,3.0,3.5,5.0
+# --- balance sheet ---
+balance,cash_and_equivalents,400,450,520,600,800
+balance,inventory,800,900,950,1000,1200
+balance,receivables,900,1050,1120,1200,1500
+balance,total_current_assets,2250,2570,2770,3000,3800
+balance,net_fixed_assets,2800,3000,3250,3500,4000
+balance,total_assets,6000,6570,7070,7600,9000
+balance,short_term_debt,350,350,380,400,400
+balance,total_current_liabilities,1300,1370,1480,1600,1800
+balance,long_term_debt,1600,1600,1650,1700,1600
+balance,total_liabilities,3300,3420,3610,3800,4000
+balance,shareholders_equity,2700,3150,3460,3800,5000
+# --- cash flow ---
+cashflow,operating_cash_flow,800,950,1100,1300,1900
+cashflow,capex,500,550,580,600,700
+cashflow,free_cash_flow,300,400,520,700,1200
+cashflow,dividends_paid,150,200,250,350,500
+# --- market (current) ---
+market,cmp,,,,,150
+market,shares_outstanding,,,,,100
+market,beta,,,,,1.05

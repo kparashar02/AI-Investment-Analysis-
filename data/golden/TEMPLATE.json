@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "kind": "REAL",
+    "instructions": [
+      "This template is for a REAL listed company and it must be filled in BY HAND from the published annual report. It cannot be generated, and it must not be filled in from a data provider's API — the entire point is to check the engine against an independent human reading of the primary source.",
+      "",
+      "HOW TO USE IT (this is the PRD Phase 0 / Phase 1 exit-gate deliverable):",
+      "  1. Copy this file to data/golden/<company>_fy<year>.json.",
+      "  2. Open the company's annual report. Use CONSOLIDATED statements.",
+      "  3. Enter every figure in rupees CRORE. If the report is in rupees million, divide by 10. If in lakh, divide by 100. Record whatever you did in _meta.unit_conversion.",
+      "  4. Enter costs, capex, depreciation, interest and tax as POSITIVE magnitudes.",
+      "  5. Check that total_assets equals total_liabilities plus shareholders_equity. The loader will flag it if not.",
+      "  6. Compute each expected ratio BY HAND in Excel from these same figures. Do not run the engine first and copy its output — that would make the test circular and worthless.",
+      "  7. Record each expected value below with the page of the annual report the inputs came from.",
+      "  8. Run: pytest tests/unit/test_golden_files.py",
+      "",
+      "A deviation between your Excel value and the engine is informative either way. The usual causes, in order of frequency: consolidated vs standalone mismatch, a fiscal-year labelling difference, an average-vs-closing balance-sheet convention, or a genuine engine bug. Investigate before assuming the engine is wrong, and record the finding in docs/EVALUATION.md."
+    ],
+    "company_source": "e.g. Annual Report FY2026, pages 142-150",
+    "entered_by": "",
+    "entered_on": "YYYY-MM-DD",
+    "unit_conversion": "e.g. report in Rs million; divided by 10 to reach Rs crore",
+    "basis_note": "Consolidated. Note any restatement of the comparative year."
+  },
+
+  "company": {
+    "ticker": "XXXX.NS",
+    "company_name": "",
+    "sector": "",
+    "industry": "",
+    "fiscal_year_end": "03-31"
+  },
+
+  "market": {
+    "ticker": "XXXX.NS",
+    "cmp": 0.0,
+    "shares_outstanding": 0.0,
+    "beta": null,
+    "as_of": "YYYY-MM-DD",
+    "source": "e.g. NSE closing price on the date above"
+  },
+
+  "annual": [
+    {
+      "label": "FY2026",
+      "period_end": "2026-03-31",
+      "basis": "CONSOLIDATED",
+      "source": "Annual Report FY2026 p.142",
+      "income": {
+        "revenue": 0.0,
+        "cogs": null,
+        "gross_profit": null,
+        "other_operating_expenses": null,
+        "ebitda": null,
+        "depreciation_amortisation": null,
+        "ebit": null,
+        "other_income": null,
+        "interest_expense": null,
+        "pbt": null,
+        "tax_expense": null,
+        "pat": 0.0,
+        "shares_basic": null,
+        "shares_diluted": null,
+        "dps": null
+      },
+      "balance": {
+        "cash_and_equivalents": null,
+        "current_investments": null,
+        "inventory": null,
+        "receivables": null,
+        "other_current_assets": null,
+        "total_current_assets": null,
+        "net_fixed_assets": null,
+        "goodwill_and_intangibles": null,
+        "other_non_current_assets": null,
+        "total_assets": null,
+        "payables": null,
+        "short_term_debt": null,
+        "other_current_liabilities": null,
+        "total_current_liabilities": null,
+        "long_term_debt": null,
+        "other_non_current_liabilities": null,
+        "total_liabilities": null,
+        "share_capital": null,
+        "reserves": null,
+        "retained_earnings": null,
+        "shareholders_equity": null,
+        "minority_interest": null
+      },
+      "cashflow": {
+        "operating_cash_flow": null,
+        "capex": null,
+        "free_cash_flow": null,
+        "dividends_paid": null,
+        "depreciation_amortisation": null,
+        "change_in_working_capital": null
+      }
+    }
+  ],
+
+  "expected_metrics": {
+    "roe": {
+      "value": 0.0,
+      "tolerance_pct": 0.5,
+      "computed_from": "PAT FY2026 / average of FY2026 and FY2025 shareholders' equity",
+      "source": "Annual Report FY2026 p.144 (P&L), p.146 (Balance Sheet)"
+    },
+    "ebitda_margin": {
+      "value": 0.0,
+      "tolerance_pct": 0.5,
+      "computed_from": "EBITDA / Revenue, FY2026",
+      "source": "Annual Report FY2026 p.144"
+    },
+    "debt_to_equity": {
+      "value": 0.0,
+      "tolerance_pct": 0.5,
+      "computed_from": "(short-term + long-term borrowings) / shareholders' equity, FY2026",
+      "source": "Annual Report FY2026 p.146"
+    },
+    "ocf_to_pat": {
+      "value": 0.0,
+      "tolerance_pct": 0.5,
+      "computed_from": "Net cash from operating activities / PAT, FY2026",
+      "source": "Annual Report FY2026 p.148"
+    }
+  }
+}

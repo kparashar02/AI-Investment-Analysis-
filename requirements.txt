@@ -1,0 +1,52 @@
+# ============================================================================
+# Agentic AI Equity Research Analyst — dependencies
+# Grouped by PRD phase so the Phase 1 core can be installed and tested alone.
+# ============================================================================
+
+# --- Phase 1: computation layer (the only deps needed to run the test suite) --
+pydantic>=2.7,<3.0
+pydantic-settings>=2.2
+PyYAML>=6.0
+pytest>=8.0
+
+# The engine deliberately uses no numpy/pandas. Every statistic it needs
+# (OLS slope, population sigma, CAGR) is implemented in pure Python in
+# app/engine/helpers.py so that results are bit-reproducible across machines
+# and BLAS versions. See PRD NF4 (determinism).
+
+# --- Phase 1b: data providers -----------------------------------------------
+httpx>=0.27
+tenacity>=8.2            # retry with exponential backoff + jitter
+yfinance>=0.2.40         # fallback statement/price source
+
+# --- Phase 2: valuation & scoring -------------------------------------------
+# (no new deps — DCF and scoring are pure Python by design)
+
+# --- Phase 3: agent layer ---------------------------------------------------
+langgraph>=1.0            # orchestration graph (confirmed on Python 3.14)
+langchain-core>=1.0       # pulled in by langgraph
+# LLM calls go through OpenRouter (OpenAI-compatible) over httpx — see
+# app/agents/llm.py. No vendor SDK is required; httpx (Phase 1b) is reused.
+# A paid vendor SDK can be swapped in later behind the same StructuredLLM seam.
+
+# --- Phase 4: report generation ---------------------------------------------
+# The Markdown and HTML renderers are pure Python, and the 8 charts are
+# hand-generated inline SVG (no Jinja2, no Plotly) — inline SVG renders in both
+# a browser and a PDF engine and is deterministic/testable.
+# weasyprint is OPTIONAL: it renders the HTML to PDF only where its native
+# libraries (Pango/Cairo/GObject) are present (Linux/CI). On a bare Windows box
+# it cannot import, and the app falls back to browser "Print -> Save as PDF".
+weasyprint>=62.0         # optional; HTML -> PDF where native libs exist
+
+# --- Phase 5: application ---------------------------------------------------
+fastapi>=0.111
+uvicorn>=0.30            # plain (not [standard]) — uvloop has no Windows wheel
+# Server-sent-event progress uses Starlette's StreamingResponse (no sse-starlette),
+# history persistence uses the standard-library sqlite3 (no SQLAlchemy), and the
+# browser UI is a self-contained page served by FastAPI (no Streamlit) — keeping
+# the dependency surface and the test story small.
+
+# --- Dev / test -------------------------------------------------------------
+pytest-cov>=5.0
+pytest-asyncio>=0.23
+ruff>=0.5
